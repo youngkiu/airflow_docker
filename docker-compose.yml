@@ -21,7 +21,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db/data/:/var/lib/postgresql/data/
+      - ./postgres/:/var/lib/postgresql/data/
 
   airflow:
     image: apache/airflow:2.5.3-python3.8
@@ -33,13 +33,11 @@ services:
       <<: *airflow_environment
     volumes:
       - ./logs:/opt/airflow/logs
-      - ./db/:/opt/db/
       - ./dags:/opt/airflow/dags
     command:
       - bash
       - -c
       - | # https://yaml-multiline.info/
-        /opt/db/wait-for-postgres.sh postgres 5432 airflow airflow &&
         airflow db init && 
         airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org;
         airflow webserver &
